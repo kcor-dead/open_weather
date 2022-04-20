@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:open_weather/Weather/OneCallAPI/one_call_api.dart';
 import 'package:open_weather/Weather/WebWidget/web_widget.dart';
 import 'package:open_weather/Weather/display_weather.dart';
 import 'package:http/http.dart' as http;
@@ -39,7 +40,7 @@ class _SelectionPageState extends State<SelectionPage> {
                           MaterialPageRoute(builder: (context) => const DisplayWeatherPage()),
                         );
                       },
-                      child: Text('normal weather'),
+                      child: Text('Weather API'),
                     ),
                     // ElevatedButton(
                     //   onPressed: (){
@@ -50,6 +51,15 @@ class _SelectionPageState extends State<SelectionPage> {
                     //   },
                     //   child: Text('weather widget'),
                     // ),
+                    ElevatedButton(
+                      onPressed: (){
+                        //const WeatherWidgetPage()
+                        Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const OneCallAPIPage()),
+                        );
+                      },
+                      child: Text('One Call API'),
+                    ),
                     const SizedBox(height: 20,),
 
                   ],

@@ -2,38 +2,40 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'display_weather_view_model.dart';
 import 'package:http/http.dart' as http;
 
-class DisplayWeatherPage extends StatefulWidget {
-  const DisplayWeatherPage({
+class OneCallAPIPage extends StatefulWidget {
+  const OneCallAPIPage({
     Key? key,
   }) : super(key: key);
 
   @override
-  _DisplayWeatherPageState createState() => _DisplayWeatherPageState();
+  _OneCallAPIPageState createState() => _OneCallAPIPageState();
 }
 
-class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWeatherPageViewModel {
+class _OneCallAPIPageState extends State<OneCallAPIPage> {
   bool isLoading = true;
 
   String lat = '';
   String lon = '';
 
-  List<DropdownMenuItem<dynamic>> weatherDisplayType = [];
-  DisplayType? selectedWeatherDisplay;
+  // List<DropdownMenuItem<dynamic>> weatherDisplayType = [];
+  // DisplayType? selectedWeatherDisplay;
 
   dynamic dataDisplay;
+
+  dynamic weather = [];
+  dynamic hour = [];
 
   @override
   void initState() {
     super.initState();
-    weatherDisplayType = DisplayType.values.map((val) {
-      return DropdownMenuItem(
-        child: Text(val.toString().split('.')[1]),
-        value: val,
-      );
-    }).toList();
+    // weatherDisplayType = DisplayType.values.map((val) {
+    //   return DropdownMenuItem(
+    //     child: Text(val.toString().split('.')[1]),
+    //     value: val,
+    //   );
+    // }).toList();
     WidgetsBinding.instance!.addPostFrameCallback((_) => initData());
   }
 
@@ -45,8 +47,14 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
       val.first['local_names'] = null;
       lat = val.first['lat'].toString();
       lon = val.first['lon'].toString();
-      print(val.first);
-      print(lat);
+      // print(val.first);
+      // print(lat);
+      http.Response response2 = await http.get(Uri.parse("https://api.openweathermap.org/data/2.5/onecall?lat=$lat&lon=$lon&appid=5456be4fa11f29f0829cb3c94d61e972"));
+      var val2 = json.decode(response2.body);
+      val2['local_names'] = null;
+      print(val2['hourly']);
+      weather = val2['current']['weather'];
+      hour = val2['hourly'];
       setState(() {
         isLoading = false;
       });
@@ -104,36 +112,48 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
     );
   }
 
+  hourRow(element){
+    var tmp = DateTime.fromMillisecondsSinceEpoch(element['dt'] * 1000);
+    String display = tmp.year.toString() + '/' + tmp.month.toString() + '/' + tmp.day.toString() + ' ' + tmp.hour.toString() + ':' + tmp.minute.toString().padLeft(2,'0') + ':' + tmp.second.toString().padLeft(2,'0');
+    return rowWidget(display,element['temp']);
+  }
+
   view(){
-    if(selectedWeatherDisplay != null && dataDisplay != null){
-      switch(selectedWeatherDisplay!){
-        case DisplayType.CurrentWeather:
-          return currentWeatherContainer();
-          break;
-
-        case DisplayType.HourlyWeather:
-          return Container();
-          break;
-      }
-    }
-
+    // if(selectedWeatherDisplay != null && dataDisplay != null){
+    //   switch(selectedWeatherDisplay!){
+    //     case DisplayType.CurrentWeather:
+    //       return currentWeatherContainer();
+    //       break;
+    //
+    //     case DisplayType.HourlyWeather:
+    //       return Container();
+    //       break;
+    //   }
+    // }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('hourly'),
+        for(var element in hour)
+          hourRow(element),
+      ],
+    );
     return Container();
   }
 
   getWeather(){
-    print('kjnl');
-    if(selectedWeatherDisplay != null){
-      switch(selectedWeatherDisplay!){
-        case DisplayType.CurrentWeather:
-          getCurWeather();
-          break;
-      }
-      switch(selectedWeatherDisplay!){
-        case DisplayType.HourlyWeather:
-          getHourlyWeather();
-          break;
-      }
-    }
+    // if(selectedWeatherDisplay != null){
+    //   switch(selectedWeatherDisplay!){
+    //     case DisplayType.CurrentWeather:
+    //       getCurWeather();
+    //       break;
+    //   }
+    //   switch(selectedWeatherDisplay!){
+    //     case DisplayType.HourlyWeather:
+    //       getHourlyWeather();
+    //       break;
+    //   }
+    // }
   }
 
   @override
@@ -153,23 +173,23 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
             child: Column(
               children: [
                 const SizedBox(height: 20,),
-                DropdownButton(
-                  isExpanded: true,
-                  isDense: true,
-                  hint: Text(
-                    'Display Type',
-                  ),
-                  value: selectedWeatherDisplay,
-                  underline: Container(),
-                  onChanged: (dynamic newValue) {
-                    selectedWeatherDisplay = newValue;
-                    getWeather();
-                    if (mounted) {
-                      setState(() {});
-                    }
-                  },
-                  items: weatherDisplayType,
-                ),
+                // DropdownButton(
+                //   isExpanded: true,
+                //   isDense: true,
+                //   hint: Text(
+                //     'Display Type',
+                //   ),
+                //   value: selectedWeatherDisplay,
+                //   underline: Container(),
+                //   onChanged: (dynamic newValue) {
+                //     selectedWeatherDisplay = newValue;
+                //     getWeather();
+                //     if (mounted) {
+                //       setState(() {});
+                //     }
+                //   },
+                //   items: weatherDisplayType,
+                // ),
                 const SizedBox(height: 20,),
                 view(),
                 const SizedBox(height: 20,),

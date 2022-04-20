@@ -55,16 +55,12 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
   }
 
   getCurWeather() async {
-    // http.Response response = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/direct?q=Kuala Lumpur, MY&limit=5&appid=5456be4fa11f29f0829cb3c94d61e972"));
-    print('erth');
-    print(lat);
+    // call API get current weather
     http.Response response = await http.get(Uri.parse("https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=5456be4fa11f29f0829cb3c94d61e972"));
     if (response.statusCode == HttpStatus.ok) {
       var val = json.decode(response.body);
       dataDisplay = val;
-      print(val);
       setState(() {});
-
     }
   }
 
@@ -124,13 +120,10 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
                   isExpanded: true,
                   isDense: true,
                   hint: Text(
-                    'display type',
+                    'Display Type',
                   ),
                   value: selectedWeatherDisplay,
                   underline: Container(),
-                  onTap: () {
-                    print('hello');
-                  },
                   onChanged: (dynamic newValue) {
                     selectedWeatherDisplay = newValue;
                     getCurWeather();

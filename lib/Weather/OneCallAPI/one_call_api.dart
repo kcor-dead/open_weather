@@ -26,6 +26,7 @@ class _OneCallAPIPageState extends State<OneCallAPIPage> {
 
   dynamic weather = [];
   dynamic hour = [];
+  dynamic day = [];
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class _OneCallAPIPageState extends State<OneCallAPIPage> {
   }
 
   initData() async {
+    //get kuala lumpur lat lon
     http.Response response = await http.get(Uri.parse("http://api.openweathermap.org/geo/1.0/direct?q=Kuala Lumpur, MY&limit=5&appid=5456be4fa11f29f0829cb3c94d61e972"));
     if (response.statusCode == HttpStatus.ok) {
       var val = json.decode(response.body);
@@ -55,6 +57,7 @@ class _OneCallAPIPageState extends State<OneCallAPIPage> {
       print(val2['hourly']);
       weather = val2['current']['weather'];
       hour = val2['hourly'];
+      day = val2['daily'];
       setState(() {
         isLoading = false;
       });
@@ -115,7 +118,25 @@ class _OneCallAPIPageState extends State<OneCallAPIPage> {
   hourRow(element){
     var tmp = DateTime.fromMillisecondsSinceEpoch(element['dt'] * 1000);
     String display = tmp.year.toString() + '/' + tmp.month.toString() + '/' + tmp.day.toString() + ' ' + tmp.hour.toString() + ':' + tmp.minute.toString().padLeft(2,'0') + ':' + tmp.second.toString().padLeft(2,'0');
-    return rowWidget(display,element['temp']);
+    return Column(
+      children: [
+        rowWidget(display,element['temp']),
+        Divider(),
+      ],
+    );
+  }
+
+  dayRow(element){
+    var tmp = DateTime.fromMillisecondsSinceEpoch(element['dt'] * 1000);
+    String display = tmp.year.toString() + '/' + tmp.month.toString() + '/' + tmp.day.toString() + ' ' + tmp.hour.toString() + ':' + tmp.minute.toString().padLeft(2,'0') + ':' + tmp.second.toString().padLeft(2,'0');
+    return Column(
+      children: [
+        rowWidget(display,''),
+        rowWidget('day',element['temp']['day']),
+        rowWidget('night',element['temp']['night']),
+        Divider(),
+      ],
+    );
   }
 
   view(){
@@ -134,8 +155,36 @@ class _OneCallAPIPageState extends State<OneCallAPIPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('hourly'),
-        for(var element in hour)
-          hourRow(element),
+        Container(
+          height: 300,
+          decoration: BoxDecoration(
+            border: Border.all(width: 2, color: Colors.black54),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                for(var element in hour)
+                  hourRow(element),
+              ],
+            ),
+          ),
+        ),
+        SizedBox(height: 20,),
+        Text('daily'),
+        Container(
+          height: 300,
+          decoration: BoxDecoration(
+            border: Border.all(width: 2, color: Colors.black54),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                for(var element in day)
+                  dayRow(element),
+              ],
+            ),
+          ),
+        ),
       ],
     );
     return Container();
@@ -193,12 +242,6 @@ class _OneCallAPIPageState extends State<OneCallAPIPage> {
                 const SizedBox(height: 20,),
                 view(),
                 const SizedBox(height: 20,),
-                GestureDetector(
-                  onTap: (){
-                    getWeather();
-                  },
-                  child: Text('refresh'),
-                ),
               ],
             ),
           ),

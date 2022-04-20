@@ -56,6 +56,7 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
 
   getCurWeather() async {
     // call API get current weather
+    dataDisplay = null;
     http.Response response = await http.get(Uri.parse("https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=5456be4fa11f29f0829cb3c94d61e972"));
     if (response.statusCode == HttpStatus.ok) {
       var val = json.decode(response.body);
@@ -66,10 +67,9 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
 
   getHourlyWeather() async {
     // call API get hourly weather
-    print('esrt');
     http.Response response = await http.get(Uri.parse("https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=$lat&lon=$lon&appid=5456be4fa11f29f0829cb3c94d61e972"));
     var val = json.decode(response.body);
-    print(val);
+    dataDisplay = null;
     if (response.statusCode == HttpStatus.ok) {
       var val = json.decode(response.body);
       dataDisplay = val;
@@ -112,7 +112,9 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
           break;
 
         case DisplayType.HourlyWeather:
-          return Container();
+          return Container(
+            child: Text('Feature not available'),
+          );
           break;
       }
     }
@@ -121,7 +123,6 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
   }
 
   getWeather(){
-    print('kjnl');
     if(selectedWeatherDisplay != null){
       switch(selectedWeatherDisplay!){
         case DisplayType.CurrentWeather:
@@ -173,12 +174,6 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
                 const SizedBox(height: 20,),
                 view(),
                 const SizedBox(height: 20,),
-                GestureDetector(
-                  onTap: (){
-                    getWeather();
-                  },
-                  child: Text('refresh'),
-                ),
               ],
             ),
           ),

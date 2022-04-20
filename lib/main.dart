@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'Weather/display_weather.dart';
+import 'SelectionPage/selection_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const DisplayWeatherPage(),
+      home: SelectionPage(),
     );
   }
 }

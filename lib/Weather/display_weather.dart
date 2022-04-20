@@ -64,6 +64,20 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
     }
   }
 
+  getHourlyWeather() async {
+    // call API get hourly weather
+    print('esrt');
+    http.Response response = await http.get(Uri.parse("https://pro.openweathermap.org/data/2.5/forecast/hourly?lat=$lat&lon=$lon&appid=5456be4fa11f29f0829cb3c94d61e972"));
+    var val = json.decode(response.body);
+    print(val);
+    if (response.statusCode == HttpStatus.ok) {
+      var val = json.decode(response.body);
+      dataDisplay = val;
+      print(val);
+      setState(() {});
+    }
+  }
+
   rowWidget(text1, text2){
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -96,15 +110,38 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
         case DisplayType.CurrentWeather:
           return currentWeatherContainer();
           break;
+
+        case DisplayType.HourlyWeather:
+          return Container();
+          break;
       }
     }
 
     return Container();
   }
 
+  getWeather(){
+    print('kjnl');
+    if(selectedWeatherDisplay != null){
+      switch(selectedWeatherDisplay!){
+        case DisplayType.CurrentWeather:
+          getCurWeather();
+          break;
+      }
+      switch(selectedWeatherDisplay!){
+        case DisplayType.HourlyWeather:
+          getHourlyWeather();
+          break;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Normal Weather'),
+      ),
       body: SafeArea(
         bottom: false,
         child: isLoading
@@ -126,7 +163,7 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
                   underline: Container(),
                   onChanged: (dynamic newValue) {
                     selectedWeatherDisplay = newValue;
-                    getCurWeather();
+                    getWeather();
                     if (mounted) {
                       setState(() {});
                     }
@@ -136,6 +173,12 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
                 const SizedBox(height: 20,),
                 view(),
                 const SizedBox(height: 20,),
+                GestureDetector(
+                  onTap: (){
+                    getWeather();
+                  },
+                  child: Text('refresh'),
+                ),
               ],
             ),
           ),
@@ -147,4 +190,5 @@ class _DisplayWeatherPageState extends State<DisplayWeatherPage> with DisplayWea
 
 enum DisplayType{
   CurrentWeather,
+  HourlyWeather,
 }
